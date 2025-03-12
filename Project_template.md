@@ -77,7 +77,7 @@
 ### 5. Визуализация контекста системы — диаграмма С4
 
 ```markdown
-[Диаграмма контекста приложения](https://github.com/vir37/architecture-sprint-3/blob/main/AppContext.puml)
+[Диаграмма контекста приложения](https://github.com/vir37/architecture-sprint-3/blob/warmhouse/AppContext.puml)
 ```
 
 # Задание 2. Проектирование микросервисной архитектуры
@@ -87,19 +87,19 @@
 **Диаграмма контейнеров (Containers)**
 
 ```markdown
-[Диаграмма контейнеров](https://github.com/vir37/architecture-sprint-3/blob/main/AppContainers.puml)
+[Диаграмма контейнеров](https://github.com/vir37/architecture-sprint-3/blob/warmhouse/AppContainers.puml)
 ```
 
 **Диаграмма компонентов (Components)**
 
 ```markdown
-[Диаграмма компонентов](https://github.com/vir37/architecture-sprint-3/blob/main/AppComponent.puml)
+[Диаграмма компонентов](https://github.com/vir37/architecture-sprint-3/blob/warmhouse/AppComponent.puml)
 ```
 
 **Диаграмма кода (Code)**
 
 ```markdown
-[Диаграмма кода](https://github.com/vir37/architecture-sprint-3/blob/main/AppCode.puml)
+[Диаграмма кода](https://github.com/vir37/architecture-sprint-3/blob/warmhouse/AppCode.puml)
 ```
 
 # Задание 3. Разработка ER-диаграммы
@@ -107,7 +107,7 @@
 **ER-диаграмма**
 
 ```markdown
-[ER-диаграмма](https://github.com/vir37/architecture-sprint-3/blob/main/ERDiagrams.puml)
+[ER-диаграмма](https://github.com/vir37/architecture-sprint-3/blob/warmhouse/ERDiagrams.puml)
 ```
 
 
