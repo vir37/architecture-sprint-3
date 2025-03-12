@@ -1,0 +1,99 @@
+@startuml
+' Пользователь
+entity User {
+    * id : int
+    --
+    * name : text
+    * pass : text <<hash>
+    * status : int
+}
+
+' Дом
+entity House {
+    * id : int
+    --
+    * user_id : int <<FK>>
+    * address_region : int
+    address : text
+}
+
+' Заявка
+entity Claim {
+    * id : int
+    --
+    * user_id : int <<FK>>
+    * status : int
+    * claim_text : text
+}
+
+' Уведомление
+entity Notice {
+    * id : uuid
+    --
+    * user_id : int <<FK>>
+    * status : int
+    * message_text : text
+}
+
+' Данные телеметрии
+entity TelemetryData {
+    * id : uuid
+    --
+    * timestamp : datetime
+    * device_id : number <<FK>>
+    * indicator_id : int <<FK>>
+    * indicator_value : float
+}
+
+' Устройство
+entity Device {
+    * id : number
+    --
+    * device_type_id : int <<FK>>
+    * house_id : int <<FK>>
+    * status : int
+    serial_number : text
+    description : text
+}
+
+' Тип устройства
+entity DeviceType {
+    * id : int
+    --
+    * name : text
+    * description : text
+    * protocol_id : int <<FK>>
+}
+
+' Расписание
+entity Schedule {
+    * id : number
+    --
+    * house_id : int <<FK>>
+    * status : int
+    * description : text
+}
+
+' Действие расписания
+entity ScheduleAction {
+    * id : number
+    --
+    * schedule_id : number <<FK>>
+    * device_id : int <<FK>>
+    * action : json
+    * status : int
+}
+
+' -- Отношения
+
+User ||--o{ House
+House ||--o{ Device
+House ||--o{ Schedule
+Device }o-|| DeviceType
+Device ||--o{ TelemetryData
+
+User ||--o{ Notice
+User ||--o{ Claim
+Schedule ||-|{ ScheduleAction
+
+@enduml
