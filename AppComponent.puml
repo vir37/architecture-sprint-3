@@ -1,0 +1,68 @@
+@startuml
+title Warm-house Components Diagram
+
+!include ./C4_templates/C4_Component.puml
+LAYOUT_WITH_LEGEND()
+
+Container_Boundary(notification, "Notification Service", $descr="Уведомляет пользователей по различным каналам связи"){
+    Component(apiNotifyController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(providerController, "Notification Service Providers Controller", $descr="Осуществляет взаимодействие с поставщиками услуг оповещения")
+    Component(notificationQC, "Queue Controller", $descr="Контроллер работы с очередью сообщений")
+    Rel_U(notificationQC, providerController, "Send notification")
+    Rel_R(apiNotifyController, providerController, "CRUD providers")
+}
+
+Container_Boundary(supportService, "Support Application", $descr="Принимает и обрабатывает заявки пользователей"){
+    Component(apiSupportController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(claimController, "Claim Controller", $descr="Обрабатывает заявки")
+    Rel_D(apiSupportController, claimController, "Manage claims")
+}
+
+Container_Boundary(authService, "Authorization Application", $descr="Предоставляет функциональность авторизации"){
+    Component(apiAuthController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(authProvController, "Authentication Providers Controller", $descr="Реализует логику работы с различными провайдера аутентификации")
+    Rel_D(apiAuthController, authProvController, "Authenticate")
+}
+
+Container_Boundary(homeService, "Home Management App", $descr="Создает/удаляет/редактирует дом, добавляет/удаляет устройства"){
+    Component(apiHomeController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+}
+
+Container_Boundary(telemetryService, "Telemetry Management App", $descr="Собирает/предоставляет данные телеметрии"){
+    Component(apiTelemetryController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(telemetryQC, "Queue Controller", $descr="Контроллер работы с очередью сообщений")
+    Component(telemetryProcessor, "Telemetry Processor", $descr="Обрабатывает поступающие данные от датчиков")
+    Rel_U(telemetryQC, telemetryProcessor, "Receive telemetry data")
+    Rel_R(apiTelemetryController, telemetryProcessor, "Uses")
+}
+
+Container_Boundary(deviceService, "Device Management App", $descr="Включает/выключает/ конфигурирует/мониторит устройство"){
+    Component(apiDevController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(deviceCP, "Command Processor", $descr="Осуществляет взаимодействие с устройством через команды")
+    Component(deviceMP, "Message Processor", $descr="Обрабатывает сообщения от устройств (датчиков)")
+    Component(deviceQC, "Queue Controller", $descr="Контроллер работы с очередью сообщений")
+    Rel_D(apiDevController, deviceMP, "Put message from device")
+    Rel_D(apiDevController, deviceCP, "Send command to device")
+    Rel_D(deviceMP, deviceQC, "Publish telemetry data")
+}
+
+Container_Boundary(scheduleService, "Schedule Management App", $descr="Создает/редактирует/удаляет расписание, следит за выполнением заданий"){
+    Component(apiSchController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(scheduler, "Scheduler", $descr="Планирует выполнение расписания")
+    Rel_D(apiSchController, scheduler, "Put new schedule")
+}
+
+Container_Boundary(profileService, "Profile App", $descr="Предоставляет функциональность по управлению профилем пользователя"){
+    Component(apiProfController, "Service API", $descr="Предоставляет API взаимодействия с микросервисом")
+    Component(ARController, "Access Recovery Controller", $descr="Предоставляет функциональность восстановления доступ к профилю")
+    Rel_D(apiProfController, ARController, "Send request for access recovery")
+}
+
+Lay_D(notification, supportService)
+Lay_D(authService, homeService)
+Lay_R(notification, authService)
+Lay_D(telemetryService, deviceService)
+Lay_D(scheduleService, profileService)
+Lay_R(authService, telemetryService)
+Lay_R(telemetryService, scheduleService)
+@enduml

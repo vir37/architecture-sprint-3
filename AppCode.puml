@@ -1,0 +1,94 @@
+@startuml
+title Warm-house  Code Diagram
+
+class User {
+    + Integer id
+    + String name
+    + String pass
+    + Integer status
+    List<House> houses
+    List<Claim> claims
+    List<Notice> notices
+    + void register()
+    + void login()
+}
+
+class Claim {
+    +Integer id
+    +User user_id
+    +Integer status
+    +String claim_text
+}
+
+class Notice {
+    + UUID id
+    + User user
+    + Integer status
+    + String message_text
+    +void send()
+}
+
+class TelemetryData {
+    + UUID id
+    + DateTime timestamp
+    + Device device
+    + Indicator indicator
+    + Float indicator_value
+}
+
+class Device {
+    + Number id
+    + DeviceType device_type
+    + House house
+    + Integer status
+    String serial_number
+    String description
+
+    +void activate()
+    +void deactivate()
+    +void do_action()
+}
+
+class House {
+    + Integer id
+    + User user_id
+    + Integer address_region
+    String address
+    List<Device> devices
+    List<Schedule> schedules
+}
+
+class DeviceType {
+    + Integer id
+    + String name
+    + String description
+    + Protocol protocol
+}
+
+class Schedule {
+    + Number id
+    + House house
+    + Integer status
+    + String description
+    + List<ScheduleAction> actions
+    +void run()
+}
+
+class ScheduleAction {
+    + Number id
+    + Schedule schedule
+    + Device device
+    + JSON action
+    + Integer status
+    +void run()
+}
+
+User "1" -- "0..*" House : has
+User "1" -- "0..*" Notice : has
+User "1" -- "0..*" Claim : has
+House "1" -- "0..*" Device : has
+Device "1" -- "0..*" TelemetryData : has
+Device "0..*" -- "1" DeviceType : has
+Schedule "1" -- "1..*" ScheduleAction : has
+House "1" -- "0..*" Schedule : has
+@enduml

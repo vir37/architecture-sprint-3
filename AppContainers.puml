@@ -1,0 +1,80 @@
+@startuml
+title Warm-house Containers Diagram
+!define RELATIVE_INCLUDE  relative
+
+!include ./C4_templates/C4_Container.puml
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!define DEVICONS https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/devicons
+!include FONTAWESOME/users.puml
+!include DEVICONS/redis.puml
+!include DEVICONS/postgresql.puml
+!include DEVICONS/java.puml
+
+
+LAYOUT_WITH_LEGEND()
+
+Person(customer, "Customer", "Пользователи приложения ''Теплый дом''", $sprite="users")
+System_Ext(deviceExt, "Home device", "Устройство в доме", $type="hardware")
+
+System_Boundary(warmhouse, "SmartHome"){
+    Container(webApplication, "Web Application", $techn="Container: Angular", $descr="Позволяет пользователям управлять домом")
+    Container(apiGateway, "API Gateway", $techn="Container: Kong", $descr="Распределяет запросы между микросервисами")
+    Container(notification, "Notification Service", $techn="Container: Java, Spring", $descr="Уведомляет пользователей по различным каналам связи", $sprite="java")
+    Container_Boundary(support, "Support service", $descr="Сервис поддержки пользователей"){
+        Container(supportService, "Support Application", $techn="Container: Java, Spring", $descr="Принимает и обрабатывает заявки пользователей", $sprite="java")
+        ContainerDb(supportDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся заявки пользователей, история их обработки", $sprite="postgresql")
+    }
+    Container_Boundary(authContainer, "Authorization service", $descr="Сервис управления авторизацией") {
+        Container(authService, "Authorization Application", $techn="Container: Java, Spring", $descr="Предоставляет функциональность авторизации", $sprite="java")
+        ContainerDb(authDb, "Database", $techn="Container: Redis", $descr="Хранятся токены авторизации пользователей",$sprite="redis")
+    }
+    Container_Boundary(customerProfile, "Profile service", $descr="Сервис управления профилем пользователя"){
+        Container(profileService, "Profile App", $techn="Container: Java, Spring", $descr="Предоставляет функциональность по управлению профилем пользователя", $sprite="java")
+        ContainerDb(profileDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся данные пользователя", $sprite="postgresql")
+    }
+    Container_Boundary(home, "Home management service", $descr="Сервис управления домом"){
+        Container(homeService, "Home Management App", $techn="Container: Java, Spring", $descr="Создает/удаляет/редактирует дом, добавляет/удаляет устройства", $sprite="java")
+        ContainerDb(homeServiceDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся данные о доме пользователя", $sprite="postgresql")
+    }
+    Container_Boundary(device, "Device management service", $descr="Сервис управления устройством"){
+        Container(deviceService, "Device Management App", $techn="Container: Java, Spring", $descr="Включает/выключает/ конфигурирует/мониторит устройство", $sprite="java")
+        Container(deviceServiceDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся данные о конфигурации устройства, его последнем состоянии", $sprite="postgresql")
+    }
+    Container_Boundary(schedule, "Schedule management service", $descr="Сервис управления расписанием дома"){
+        Container(scheduleService, "Schedule Management App", $techn="Container: Java, Spring", $descr="Создает/редактирует/удаляет расписание, следит за выполнением заданий", $sprite="java")
+        ContainerDb(scheduleServiceDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся данные о сконфигурированных расписаниях, статусах выполнения", $sprite="postgresql")
+    }
+    Container_Boundary(telemetry, "Store of telemetry data", $descr="Сервис хранения данных телеметрии"){
+        Container(telemetryService, "Telemetry Management App", $techn="Container: Java, Spring", $descr="Собирает/предоставляет данные телеметрии", $sprite="java")
+        ContainerDb(telemetryDb, "Database", $techn="Container: PostgreSQL", $descr="Хранятся данные телеметрии", $sprite="postgresql")
+    }
+
+    ContainerQueue(kafka, "Message Queue", $descr="Передает сообщения между микросервисам", $techn="Container: Kafka")
+}
+
+
+Rel_D(scheduleService, scheduleServiceDb, "Reads/Writes", $techn="SQL")
+Rel_D(deviceService, deviceServiceDb, "Reads/Writes", $techn="SQL")
+Rel_D(authService, authDb, "Reads/Writes", $techn="NoSQL")
+Rel_D(homeService, homeServiceDb, "Reads/Writes", $techn="SQL")
+Rel_D(profileService, profileDb, "Reads/Writes", $techn="SQL")
+Rel_D(supportService, supportDb, "Reads/Writes", $techn="SQL")
+Rel_D(telemetryService, telemetryDb, "Reads/Writes", $techn="SQL")
+Rel_D(webApplication, apiGateway, "Uses", $techn="HTTPS")
+Rel_D(customer, webApplication, "Uses", $techn="HTTPS")
+Rel_D(deviceService, kafka, "Publish notification data")
+Rel_D(deviceService, kafka, "Publish telemetry data")
+Rel_D(notification, kafka, "Subscribe to notifications")
+Rel_D(telemetryService, kafka, "Subscribe to telemetry data")
+
+BiRel_D(apiGateway, scheduleService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, deviceService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, authService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, homeService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, profileService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, supportService, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, notification, "Uses", $techn="HTTPS")
+BiRel_D(apiGateway, telemetryService, "Uses", $techn="HTTPS")
+BiRel_R(apiGateway, deviceExt, "Telemetry/Commands")
+
+@enduml

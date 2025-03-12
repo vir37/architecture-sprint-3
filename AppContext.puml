@@ -1,0 +1,18 @@
+@startuml
+title Warm-house Context Diagram
+!define RELATIVE_INCLUDE relative
+
+!include ./C4_templates/C4_Context.puml
+
+!define FONTAWESOME https://raw.githubusercontent.com/tupadr3/plantuml-icon-font-sprites/master/font-awesome-5
+!include FONTAWESOME/users.puml
+
+LAYOUT_WITH_LEGEND()
+
+Person(customer, "Customer", "Пользователи приложения ''Теплый дом''", $sprite="users")
+System(warmhouse, "SmartHome", "Позволяет пользователям проверять температуру, управлять отоплением",$type="Software")
+System_Ext(boiler, "HeatingSystem", "Система отопления дома", $type="hardware")
+
+Rel_D(customer, warmhouse, "Просмотр температуры, включение/выключение отопления", $techn="sync")
+Rel_R(warmhouse, boiler, "Включение/выключение/ установка целевой температуры/ получение текущей температуры", $techn="sync")
+@enduml
